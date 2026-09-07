@@ -139,3 +139,32 @@ Play 프로텍트는 **APK가 끄거나 통과시킬 수 있는 것이 아니라
 - jadx 1.5.2 (디컴파일/분석)
 - uber-apk-signer 1.3.0 (zipalign + v1/v2/v3 서명)
 - keytool (JDK 21), pyaxmlparser (매니페스트 독립 검증)
+
+---
+
+## 7. 추가 개조 (2차)
+
+업로드해 주신 빌드를 기준으로 다음을 반영했습니다.
+
+### 7-1. 인앱결제(billing) 제거
+- `com.android.vending.BILLING` 권한 삭제, Play 결제 서비스 **bind/unbind를 try/catch로 감싸 연결 자체를 무력화**(앱 안정성 유지, 크래시 방지).
+- 프리미엄 판정 `c.p()`를 **항상 true**로 패치 → 잠금 기능(커스텀 테마 등) 전부 해제, "Upgrade Pro" 안내창 미표시.
+
+### 7-2. "업그레이드 프로" 메뉴 삭제
+- 메인 화면 하단의 `button_upgrade_pro` 버튼을 `visibility="gone"` 처리(뷰 참조는 유지 → NPE 없음).
+
+### 7-3. 사진(미디어) 권한 Android 13+ 대응
+- `READ/WRITE_EXTERNAL_STORAGE`는 Android 13+에서 부여 불가 → 요청해도 적용 안 됨이 원인.
+- 매니페스트에 `READ_MEDIA_IMAGES/VIDEO/AUDIO`, `READ_MEDIA_VISUAL_USER_SELECTED` 추가(레거시 저장소 권한엔 `maxSdkVersion` 지정).
+- 권한 체크/요청을 SDK별로 올바른 미디어 권한을 쓰도록 헬퍼(`Cc.storageState`/`storagePerms`)로 교체(권한 설정 화면·음악 기능).
+
+### 7-4. 플로팅바가 홈화면에서 안 뜨는 문제
+- 원인: `MainService`가 **포그라운드 서비스가 아니라** Android 8+ 백그라운드 제한으로 앱이 백그라운드가 되면 종료 → 오버레이 사라짐.
+- `MainService`를 **포그라운드 서비스로 승격**: 매니페스트 `foregroundServiceType="specialUse"` + `FOREGROUND_SERVICE(_SPECIAL_USE)` 권한, 시작 시 알림 채널 생성 후 `startForeground` 호출, 시작 호출을 `startForegroundService`로 전환 → **홈화면에서도 바 상주**.
+- 상시 낮은 우선순위 알림("Floating Bar")이 1개 표시됩니다(포그라운드 서비스 필수 요건).
+
+### 7-5. 겸사겸사
+- Play 프로텍트 완화를 위해 `QUERY_ALL_PACKAGES` 제거 → 범위 지정 `<queries>`(MAIN/LAUNCHER)로 대체.
+- 앱 표시 이름을 리터럴 "타이탄2엘리트 플로팅바"로 유지(설정 화면에서도 패키지명 대신 표시).
+
+> 접근성/기기관리자/알림접근 서비스는 이번 업로드 기준(풀버전)에 맞춰 유지했습니다. Play 프로텍트 차단이 다시 걸리면 이전에 안내드린 "무시하고 설치" 또는 해당 서비스 제거판으로 대응할 수 있습니다.
