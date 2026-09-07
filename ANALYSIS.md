@@ -68,6 +68,9 @@ targetSdk를 26 → **36**으로 올리면 Android 12~16에서 강제되는 규�
 - **`QUERY_ALL_PACKAGES` 권한 추가** (Android 11+ 패키지 가시성 — 앱 바로가기 목록/실행 기능 유지)
 - **`usesCleartextTraffic="true"`** 추가 (평문 트래픽 차단 정책 대비 안전장치)
 
+### 3-1b. 리소스(표시 이름)
+- **앱 표시 이름(런처 라벨) `app_name` → "Titan2Elite Floating Bar"** 로 변경 (전 언어(values/values-*) 10개 로케일 통일)
+
 ### 3-2. 코드(smali) 패치 — 실행 크래시 방지
 - **`PendingIntent` 불변 플래그** — 스크린샷 기능의 `PendingIntent`에 `FLAG_IMMUTABLE` 지정
   (Android 12+에서 플래그 누락 시 `IllegalArgumentException` 크래시)
