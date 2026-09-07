@@ -70,7 +70,7 @@ targetSdk를 26 → **36**으로 올리면 Android 12~16에서 강제되는 규�
 
 ### 3-1b. 리소스(표시 이름 · 아이콘)
 - **앱 표시 이름(런처 라벨) `app_name` → "Titan2Elite Floating Bar"** 로 변경 (전 언어(values/values-*) 10개 로케일 통일)
-- **앱 아이콘 `ic_launcher` → TITAN 2 ELITE 이미지**로 교체 (mdpi~xxxhdpi 5종 밀도, 원본 디자인 전체 보존)
+- **앱 아이콘 `ic_launcher` → TITAN 2 ELITE 이미지**로 교체 (mdpi~xxxhdpi 5종 밀도, **흰 배경 제거해 투명 처리**, 글로우 가장자리 페더링)
 
 ### 3-2. 코드(smali) 패치 — 실행 크래시 방지
 - **`PendingIntent` 불변 플래그** — 스크린샷 기능의 `PendingIntent`에 `FLAG_IMMUTABLE` 지정
